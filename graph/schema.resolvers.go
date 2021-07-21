@@ -10,27 +10,31 @@ import (
 	"sa-back/graph/model"
 )
 
-func (r *queryResolver) Fields(ctx context.Context) ([]*model.Field, error) {
-	var Fields []*model.Field
-	for i := 0; i < 5; i++ {
-		dummyField := model.Field{
-			Name: fmt.Sprintf("Column name %d", i),
-		}
-		Fields = append(Fields, &dummyField)
+func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) ListAnalysis(ctx context.Context) ([]*model.Analysis, error) {
+	var Analyzes []*model.Analysis
+	a := model.Analysis{
+		Name:        "ABC",
+		Description: "Разделение товаров на три категории по степени их значимости. Поможет определить рентабельные продукты, важных клиентов и поставщиков",
+		Image:       "Тут будет путь до картинки",
+		Disabled:    false,
 	}
-
-	return Fields, nil
+	Analyzes = append(Analyzes, &a)
+	return Analyzes, nil
 }
 
-func (r *queryResolver) PercentGroups(ctx context.Context) ([]*model.PercentGroup, error) {
-	pgA := model.PercentGroup{Name: "A", Percent: 80}
-	pgB := model.PercentGroup{Name: "B", Percent: 15}
-	pgC := model.PercentGroup{Name: "C", Percent: 5}
-	pg := []*model.PercentGroup{&pgA, &pgB, &pgC}
-	return pg, nil
-}
+// Mutation returns generated.MutationResolver implementation.
+func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

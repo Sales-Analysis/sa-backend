@@ -1,14 +1,36 @@
-type Field {
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Todo {
+  id: ID!
+  text: String!
+  done: Boolean!
+  user: User!
+}
+
+type User {
+  id: ID!
   name: String!
 }
 
-type PercentGroup {
-  name: String!
-  percent: Float!
+type Analysis {
+   name: String!
+   description: String!
+   image: String!
+   disabled: Boolean! 
 }
-
 
 type Query {
-  Fields: [Field!]!
-  PercentGroups: [PercentGroup!]!
+  todos: [Todo!]!
+  ListAnalysis: [Analysis!]!
+}
+
+input NewTodo {
+  text: String!
+  userId: String!
+}
+
+type Mutation {
+  createTodo(input: NewTodo!): Todo!
 }
