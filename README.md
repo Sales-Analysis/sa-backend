@@ -15,6 +15,13 @@
     pre-commit run --all-files
 
 
+## Dev
+
+После определения схемы для генерации файла
+
+    go run github.com/99designs/gqlgen generate
+
+
 ## Run server
 
 Создание исполняемого файла

@@ -1,14 +1,12 @@
-type Field {
-  name: String!
-}
 
-type PercentGroup {
-  name: String!
-  percent: Float!
+type Analysis {
+    id: Int!
+    name: String!
+    description: String!
+    image: String!
+    disabled: Boolean!
 }
-
 
 type Query {
-  Fields: [Field!]!
-  PercentGroups: [PercentGroup!]!
+  ListAnalysis: [Analysis!]!
 }

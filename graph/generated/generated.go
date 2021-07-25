@@ -42,24 +42,21 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Field struct {
-		Name func(childComplexity int) int
-	}
-
-	PercentGroup struct {
-		Name    func(childComplexity int) int
-		Percent func(childComplexity int) int
+	Analysis struct {
+		Description func(childComplexity int) int
+		Disabled    func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Image       func(childComplexity int) int
+		Name        func(childComplexity int) int
 	}
 
 	Query struct {
-		Fields        func(childComplexity int) int
-		PercentGroups func(childComplexity int) int
+		ListAnalysis func(childComplexity int) int
 	}
 }
 
 type QueryResolver interface {
-	Fields(ctx context.Context) ([]*model.Field, error)
-	PercentGroups(ctx context.Context) ([]*model.PercentGroup, error)
+	ListAnalysis(ctx context.Context) ([]*model.Analysis, error)
 }
 
 type executableSchema struct {
@@ -77,40 +74,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Field.name":
-		if e.complexity.Field.Name == nil {
+	case "Analysis.description":
+		if e.complexity.Analysis.Description == nil {
 			break
 		}
 
-		return e.complexity.Field.Name(childComplexity), true
+		return e.complexity.Analysis.Description(childComplexity), true
 
-	case "PercentGroup.name":
-		if e.complexity.PercentGroup.Name == nil {
+	case "Analysis.disabled":
+		if e.complexity.Analysis.Disabled == nil {
 			break
 		}
 
-		return e.complexity.PercentGroup.Name(childComplexity), true
+		return e.complexity.Analysis.Disabled(childComplexity), true
 
-	case "PercentGroup.percent":
-		if e.complexity.PercentGroup.Percent == nil {
+	case "Analysis.id":
+		if e.complexity.Analysis.ID == nil {
 			break
 		}
 
-		return e.complexity.PercentGroup.Percent(childComplexity), true
+		return e.complexity.Analysis.ID(childComplexity), true
 
-	case "Query.Fields":
-		if e.complexity.Query.Fields == nil {
+	case "Analysis.image":
+		if e.complexity.Analysis.Image == nil {
 			break
 		}
 
-		return e.complexity.Query.Fields(childComplexity), true
+		return e.complexity.Analysis.Image(childComplexity), true
 
-	case "Query.PercentGroups":
-		if e.complexity.Query.PercentGroups == nil {
+	case "Analysis.name":
+		if e.complexity.Analysis.Name == nil {
 			break
 		}
 
-		return e.complexity.Query.PercentGroups(childComplexity), true
+		return e.complexity.Analysis.Name(childComplexity), true
+
+	case "Query.ListAnalysis":
+		if e.complexity.Query.ListAnalysis == nil {
+			break
+		}
+
+		return e.complexity.Query.ListAnalysis(childComplexity), true
 
 	}
 	return 0, false
@@ -162,19 +166,17 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "graph/schema.graphqls", Input: `type Field {
-  name: String!
+	{Name: "graph/schema.graphqls", Input: `
+type Analysis {
+    id: Int!
+    name: String!
+    description: String!
+    image: String!
+    disabled: Boolean!
 }
-
-type PercentGroup {
-  name: String!
-  percent: Float!
-}
-
 
 type Query {
-  Fields: [Field!]!
-  PercentGroups: [PercentGroup!]!
+  ListAnalysis: [Analysis!]!
 }
 `, BuiltIn: false},
 }
@@ -237,7 +239,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Field_name(ctx context.Context, field graphql.CollectedField, obj *model.Field) (ret graphql.Marshaler) {
+func (ec *executionContext) _Analysis_id(ctx context.Context, field graphql.CollectedField, obj *model.Analysis) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -245,7 +247,42 @@ func (ec *executionContext) _Field_name(ctx context.Context, field graphql.Colle
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "Field",
+		Object:     "Analysis",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Analysis_name(ctx context.Context, field graphql.CollectedField, obj *model.Analysis) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Analysis",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -272,7 +309,7 @@ func (ec *executionContext) _Field_name(ctx context.Context, field graphql.Colle
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PercentGroup_name(ctx context.Context, field graphql.CollectedField, obj *model.PercentGroup) (ret graphql.Marshaler) {
+func (ec *executionContext) _Analysis_description(ctx context.Context, field graphql.CollectedField, obj *model.Analysis) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -280,7 +317,7 @@ func (ec *executionContext) _PercentGroup_name(ctx context.Context, field graphq
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "PercentGroup",
+		Object:     "Analysis",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -290,7 +327,7 @@ func (ec *executionContext) _PercentGroup_name(ctx context.Context, field graphq
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
+		return obj.Description, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -307,7 +344,7 @@ func (ec *executionContext) _PercentGroup_name(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PercentGroup_percent(ctx context.Context, field graphql.CollectedField, obj *model.PercentGroup) (ret graphql.Marshaler) {
+func (ec *executionContext) _Analysis_image(ctx context.Context, field graphql.CollectedField, obj *model.Analysis) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -315,7 +352,7 @@ func (ec *executionContext) _PercentGroup_percent(ctx context.Context, field gra
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "PercentGroup",
+		Object:     "Analysis",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -325,7 +362,7 @@ func (ec *executionContext) _PercentGroup_percent(ctx context.Context, field gra
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Percent, nil
+		return obj.Image, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -337,12 +374,47 @@ func (ec *executionContext) _PercentGroup_percent(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_Fields(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Analysis_disabled(ctx context.Context, field graphql.CollectedField, obj *model.Analysis) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Analysis",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Disabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_ListAnalysis(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -360,7 +432,7 @@ func (ec *executionContext) _Query_Fields(ctx context.Context, field graphql.Col
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Fields(rctx)
+		return ec.resolvers.Query().ListAnalysis(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -372,44 +444,9 @@ func (ec *executionContext) _Query_Fields(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Field)
+	res := resTmp.([]*model.Analysis)
 	fc.Result = res
-	return ec.marshalNField2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐFieldᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_PercentGroups(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().PercentGroups(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.PercentGroup)
-	fc.Result = res
-	return ec.marshalNPercentGroup2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐPercentGroupᚄ(ctx, field.Selections, res)
+	return ec.marshalNAnalysis2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1578,51 +1615,39 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** object.gotpl ****************************
 
-var fieldImplementors = []string{"Field"}
+var analysisImplementors = []string{"Analysis"}
 
-func (ec *executionContext) _Field(ctx context.Context, sel ast.SelectionSet, obj *model.Field) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, fieldImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Field")
-		case "name":
-			out.Values[i] = ec._Field_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var percentGroupImplementors = []string{"PercentGroup"}
-
-func (ec *executionContext) _PercentGroup(ctx context.Context, sel ast.SelectionSet, obj *model.PercentGroup) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, percentGroupImplementors)
+func (ec *executionContext) _Analysis(ctx context.Context, sel ast.SelectionSet, obj *model.Analysis) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, analysisImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("PercentGroup")
-		case "name":
-			out.Values[i] = ec._PercentGroup_name(ctx, field, obj)
+			out.Values[i] = graphql.MarshalString("Analysis")
+		case "id":
+			out.Values[i] = ec._Analysis_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "percent":
-			out.Values[i] = ec._PercentGroup_percent(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._Analysis_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+			out.Values[i] = ec._Analysis_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "image":
+			out.Values[i] = ec._Analysis_image(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "disabled":
+			out.Values[i] = ec._Analysis_disabled(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -1652,7 +1677,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "Fields":
+		case "ListAnalysis":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -1660,21 +1685,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_Fields(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
-		case "PercentGroups":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_PercentGroups(ctx, field)
+				res = ec._Query_ListAnalysis(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -1940,6 +1951,53 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAnalysis2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Analysis) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAnalysis2ᚖsaᚑbackᚋgraphᚋmodelᚐAnalysis(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNAnalysis2ᚖsaᚑbackᚋgraphᚋmodelᚐAnalysis(ctx context.Context, sel ast.SelectionSet, v *model.Analysis) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Analysis(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -1955,113 +2013,19 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNField2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐFieldᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Field) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNField2ᚖsaᚑbackᚋgraphᚋmodelᚐField(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalNField2ᚖsaᚑbackᚋgraphᚋmodelᚐField(ctx context.Context, sel ast.SelectionSet, v *model.Field) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Field(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
-	res, err := graphql.UnmarshalFloat(v)
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
-	res := graphql.MarshalFloat(v)
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNPercentGroup2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐPercentGroupᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PercentGroup) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNPercentGroup2ᚖsaᚑbackᚋgraphᚋmodelᚐPercentGroup(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalNPercentGroup2ᚖsaᚑbackᚋgraphᚋmodelᚐPercentGroup(ctx context.Context, sel ast.SelectionSet, v *model.PercentGroup) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._PercentGroup(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

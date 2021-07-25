@@ -2,11 +2,10 @@
 
 package model
 
-type Field struct {
-	Name string `json:"name"`
-}
-
-type PercentGroup struct {
-	Name    string  `json:"name"`
-	Percent float64 `json:"percent"`
+type Analysis struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
+	Disabled    bool   `json:"disabled"`
 }
