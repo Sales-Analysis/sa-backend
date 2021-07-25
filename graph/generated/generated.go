@@ -45,6 +45,7 @@ type ComplexityRoot struct {
 	Analysis struct {
 		Description func(childComplexity int) int
 		Disabled    func(childComplexity int) int
+		ID          func(childComplexity int) int
 		Image       func(childComplexity int) int
 		Name        func(childComplexity int) int
 	}
@@ -86,6 +87,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Analysis.Disabled(childComplexity), true
+
+	case "Analysis.id":
+		if e.complexity.Analysis.ID == nil {
+			break
+		}
+
+		return e.complexity.Analysis.ID(childComplexity), true
 
 	case "Analysis.image":
 		if e.complexity.Analysis.Image == nil {
@@ -160,10 +168,11 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 var sources = []*ast.Source{
 	{Name: "graph/schema.graphqls", Input: `
 type Analysis {
-   name: String!
-   description: String!
-   image: String!
-   disabled: Boolean! 
+    id: Int!
+    name: String!
+    description: String!
+    image: String!
+    disabled: Boolean!
 }
 
 type Query {
@@ -229,6 +238,41 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Analysis_id(ctx context.Context, field graphql.CollectedField, obj *model.Analysis) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Analysis",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Analysis_name(ctx context.Context, field graphql.CollectedField, obj *model.Analysis) (ret graphql.Marshaler) {
 	defer func() {
@@ -1582,6 +1626,11 @@ func (ec *executionContext) _Analysis(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Analysis")
+		case "id":
+			out.Values[i] = ec._Analysis_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "name":
 			out.Values[i] = ec._Analysis_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -1956,6 +2005,21 @@ func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interf
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
 	res := graphql.MarshalBoolean(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

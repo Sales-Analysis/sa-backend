@@ -1,9 +1,10 @@
 
 type Analysis {
-   name: String!
-   description: String!
-   image: String!
-   disabled: Boolean! 
+    id: Int!
+    name: String!
+    description: String!
+    image: String!
+    disabled: Boolean!
 }
 
 type Query {
