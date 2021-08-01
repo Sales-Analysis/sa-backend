@@ -25,6 +25,14 @@ func (r *queryResolver) ListHiw(ctx context.Context) ([]*model.Hiw, error) {
 	return Hiw, nil
 }
 
+func (r *queryResolver) ListFaq(ctx context.Context) ([]*model.Faq, error) {
+	var Faq []*model.Faq
+	for i := 0; i < len(r.listFAQTemplate()); i++ {
+		Faq = append(Faq, &r.listFAQTemplate()[i])
+	}
+	return Faq, nil
+}
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
@@ -36,30 +44,13 @@ type queryResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) listHiwTemplate() []model.Hiw {
-	Hiw := []model.Hiw{
-		model.Hiw{
-			ID:          0,
-			Title:       "Загрузите файл с данными",
-			Description: "Подготовьте файл в котором будут категории товаров или товары, информация по продажам \nи прибыли",
-			Image:       "static/hiw/step_1.png",
-		},
-		model.Hiw{
-			ID:          1,
-			Title:       "Настройте расчет",
-			Description: "Выберите столбцы из вашего файла, по которым нужно произвести расчет и определить группы товаров",
-			Image:       "static/hiw/step_2.png/",
-		},
-		model.Hiw{
-			ID:          2,
-			Title:       "Получите готовый отчет",
-			Description: "Отчет рассчитает и распределит все товары \nи категории по подходящим группам. Вы сможете увидеть какие товары самые рентабельные, \nа какие нет.",
-			Image:       "static/hiw/step_3.png",
-		},
+func (r *queryResolver) ListFAQ(ctx context.Context) ([]*model.Faq, error) {
+	var Faq []*model.Faq
+	for i := 0; i < len(r.listFAQTemplate()); i++ {
+		Faq = append(Faq, &r.listFAQTemplate()[i])
 	}
-	return Hiw
+	return Faq, nil
 }
-
 func (r *queryResolver) listAnalysisTemplate() []model.Analysis {
 	Analyzes := []model.Analysis{
 		model.Analysis{
@@ -106,4 +97,37 @@ func (r *queryResolver) listAnalysisTemplate() []model.Analysis {
 		},
 	}
 	return Analyzes
+}
+func (r *queryResolver) listHiwTemplate() []model.Hiw {
+	Hiw := []model.Hiw{
+		model.Hiw{
+			ID:          0,
+			Title:       "Загрузите файл с данными",
+			Description: "Подготовьте файл в котором будут категории товаров или товары, информация по продажам \nи прибыли",
+			Image:       "static/hiw/step_1.png",
+		},
+		model.Hiw{
+			ID:          1,
+			Title:       "Настройте расчет",
+			Description: "Выберите столбцы из вашего файла, по которым нужно произвести расчет и определить группы товаров",
+			Image:       "static/hiw/step_2.png/",
+		},
+		model.Hiw{
+			ID:          2,
+			Title:       "Получите готовый отчет",
+			Description: "Отчет рассчитает и распределит все товары \nи категории по подходящим группам. Вы сможете увидеть какие товары самые рентабельные, \nа какие нет.",
+			Image:       "static/hiw/step_3.png",
+		},
+	}
+	return Hiw
+}
+func (r *queryResolver) listFAQTemplate() []model.Faq {
+	Faq := []model.Faq{
+		model.Faq{
+			ID:          0,
+			Title:       "Какие знания нужны для проведения \nанализа?",
+			Description: "Никаких. Сервис подскажет, что нужно сделат чтобы провести анализ и правильно разобраться в его результатах.",
+		},
+	}
+	return Faq
 }

@@ -7,14 +7,21 @@ type Analysis {
     disabled: Boolean!
 }
 
-type Hiw {
+type HIW {
     id: Int!
     title: String!
     description: String!
     image: String!
 }
 
+type FAQ {
+    id: Int!
+    title: String!
+    description: String!
+}
+
 type Query {
     ListAnalysis: [Analysis!]!
-    ListHiw: [Hiw!]!
+    ListHIW: [HIW!]!
+    ListFAQ: [FAQ!]!
 }

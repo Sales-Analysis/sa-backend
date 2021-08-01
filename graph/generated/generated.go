@@ -50,6 +50,12 @@ type ComplexityRoot struct {
 		Name        func(childComplexity int) int
 	}
 
+	Faq struct {
+		Description func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Title       func(childComplexity int) int
+	}
+
 	Hiw struct {
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
@@ -59,6 +65,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		ListAnalysis func(childComplexity int) int
+		ListFaq      func(childComplexity int) int
 		ListHiw      func(childComplexity int) int
 	}
 }
@@ -66,6 +73,7 @@ type ComplexityRoot struct {
 type QueryResolver interface {
 	ListAnalysis(ctx context.Context) ([]*model.Analysis, error)
 	ListHiw(ctx context.Context) ([]*model.Hiw, error)
+	ListFaq(ctx context.Context) ([]*model.Faq, error)
 }
 
 type executableSchema struct {
@@ -118,28 +126,49 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Analysis.Name(childComplexity), true
 
-	case "Hiw.description":
+	case "FAQ.description":
+		if e.complexity.Faq.Description == nil {
+			break
+		}
+
+		return e.complexity.Faq.Description(childComplexity), true
+
+	case "FAQ.id":
+		if e.complexity.Faq.ID == nil {
+			break
+		}
+
+		return e.complexity.Faq.ID(childComplexity), true
+
+	case "FAQ.title":
+		if e.complexity.Faq.Title == nil {
+			break
+		}
+
+		return e.complexity.Faq.Title(childComplexity), true
+
+	case "HIW.description":
 		if e.complexity.Hiw.Description == nil {
 			break
 		}
 
 		return e.complexity.Hiw.Description(childComplexity), true
 
-	case "Hiw.id":
+	case "HIW.id":
 		if e.complexity.Hiw.ID == nil {
 			break
 		}
 
 		return e.complexity.Hiw.ID(childComplexity), true
 
-	case "Hiw.image":
+	case "HIW.image":
 		if e.complexity.Hiw.Image == nil {
 			break
 		}
 
 		return e.complexity.Hiw.Image(childComplexity), true
 
-	case "Hiw.title":
+	case "HIW.title":
 		if e.complexity.Hiw.Title == nil {
 			break
 		}
@@ -153,7 +182,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.ListAnalysis(childComplexity), true
 
-	case "Query.ListHiw":
+	case "Query.ListFAQ":
+		if e.complexity.Query.ListFaq == nil {
+			break
+		}
+
+		return e.complexity.Query.ListFaq(childComplexity), true
+
+	case "Query.ListHIW":
 		if e.complexity.Query.ListHiw == nil {
 			break
 		}
@@ -219,16 +255,23 @@ type Analysis {
     disabled: Boolean!
 }
 
-type Hiw {
+type HIW {
     id: Int!
     title: String!
     description: String!
     image: String!
 }
 
+type FAQ {
+    id: Int!
+    title: String!
+    description: String!
+}
+
 type Query {
     ListAnalysis: [Analysis!]!
-    ListHiw: [Hiw!]!
+    ListHIW: [HIW!]!
+    ListFAQ: [FAQ!]!
 }
 `, BuiltIn: false},
 }
@@ -466,7 +509,7 @@ func (ec *executionContext) _Analysis_disabled(ctx context.Context, field graphq
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Hiw_id(ctx context.Context, field graphql.CollectedField, obj *model.Hiw) (ret graphql.Marshaler) {
+func (ec *executionContext) _FAQ_id(ctx context.Context, field graphql.CollectedField, obj *model.Faq) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -474,7 +517,7 @@ func (ec *executionContext) _Hiw_id(ctx context.Context, field graphql.Collected
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "Hiw",
+		Object:     "FAQ",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -501,7 +544,7 @@ func (ec *executionContext) _Hiw_id(ctx context.Context, field graphql.Collected
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Hiw_title(ctx context.Context, field graphql.CollectedField, obj *model.Hiw) (ret graphql.Marshaler) {
+func (ec *executionContext) _FAQ_title(ctx context.Context, field graphql.CollectedField, obj *model.Faq) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -509,7 +552,7 @@ func (ec *executionContext) _Hiw_title(ctx context.Context, field graphql.Collec
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "Hiw",
+		Object:     "FAQ",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -536,7 +579,7 @@ func (ec *executionContext) _Hiw_title(ctx context.Context, field graphql.Collec
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Hiw_description(ctx context.Context, field graphql.CollectedField, obj *model.Hiw) (ret graphql.Marshaler) {
+func (ec *executionContext) _FAQ_description(ctx context.Context, field graphql.CollectedField, obj *model.Faq) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -544,7 +587,7 @@ func (ec *executionContext) _Hiw_description(ctx context.Context, field graphql.
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "Hiw",
+		Object:     "FAQ",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -571,7 +614,7 @@ func (ec *executionContext) _Hiw_description(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Hiw_image(ctx context.Context, field graphql.CollectedField, obj *model.Hiw) (ret graphql.Marshaler) {
+func (ec *executionContext) _HIW_id(ctx context.Context, field graphql.CollectedField, obj *model.Hiw) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -579,7 +622,112 @@ func (ec *executionContext) _Hiw_image(ctx context.Context, field graphql.Collec
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "Hiw",
+		Object:     "HIW",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HIW_title(ctx context.Context, field graphql.CollectedField, obj *model.Hiw) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HIW",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HIW_description(ctx context.Context, field graphql.CollectedField, obj *model.Hiw) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HIW",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HIW_image(ctx context.Context, field graphql.CollectedField, obj *model.Hiw) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HIW",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -641,7 +789,7 @@ func (ec *executionContext) _Query_ListAnalysis(ctx context.Context, field graph
 	return ec.marshalNAnalysis2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_ListHiw(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_ListHIW(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -673,7 +821,42 @@ func (ec *executionContext) _Query_ListHiw(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.Hiw)
 	fc.Result = res
-	return ec.marshalNHiw2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐHiwᚄ(ctx, field.Selections, res)
+	return ec.marshalNHIW2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐHiwᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_ListFAQ(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ListFaq(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Faq)
+	fc.Result = res
+	return ec.marshalNFAQ2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐFaqᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1889,34 +2072,71 @@ func (ec *executionContext) _Analysis(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
-var hiwImplementors = []string{"Hiw"}
+var fAQImplementors = []string{"FAQ"}
 
-func (ec *executionContext) _Hiw(ctx context.Context, sel ast.SelectionSet, obj *model.Hiw) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, hiwImplementors)
+func (ec *executionContext) _FAQ(ctx context.Context, sel ast.SelectionSet, obj *model.Faq) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, fAQImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("Hiw")
+			out.Values[i] = graphql.MarshalString("FAQ")
 		case "id":
-			out.Values[i] = ec._Hiw_id(ctx, field, obj)
+			out.Values[i] = ec._FAQ_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "title":
-			out.Values[i] = ec._Hiw_title(ctx, field, obj)
+			out.Values[i] = ec._FAQ_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec._Hiw_description(ctx, field, obj)
+			out.Values[i] = ec._FAQ_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var hIWImplementors = []string{"HIW"}
+
+func (ec *executionContext) _HIW(ctx context.Context, sel ast.SelectionSet, obj *model.Hiw) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, hIWImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HIW")
+		case "id":
+			out.Values[i] = ec._HIW_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "title":
+			out.Values[i] = ec._HIW_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+			out.Values[i] = ec._HIW_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "image":
-			out.Values[i] = ec._Hiw_image(ctx, field, obj)
+			out.Values[i] = ec._HIW_image(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -1960,7 +2180,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "ListHiw":
+		case "ListHIW":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -1968,7 +2188,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_ListHiw(ctx, field)
+				res = ec._Query_ListHIW(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "ListFAQ":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_ListFAQ(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -2296,7 +2530,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNHiw2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐHiwᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Hiw) graphql.Marshaler {
+func (ec *executionContext) marshalNFAQ2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐFaqᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Faq) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2320,7 +2554,7 @@ func (ec *executionContext) marshalNHiw2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐHiwᚄ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNHiw2ᚖsaᚑbackᚋgraphᚋmodelᚐHiw(ctx, sel, v[i])
+			ret[i] = ec.marshalNFAQ2ᚖsaᚑbackᚋgraphᚋmodelᚐFaq(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2333,14 +2567,61 @@ func (ec *executionContext) marshalNHiw2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐHiwᚄ
 	return ret
 }
 
-func (ec *executionContext) marshalNHiw2ᚖsaᚑbackᚋgraphᚋmodelᚐHiw(ctx context.Context, sel ast.SelectionSet, v *model.Hiw) graphql.Marshaler {
+func (ec *executionContext) marshalNFAQ2ᚖsaᚑbackᚋgraphᚋmodelᚐFaq(ctx context.Context, sel ast.SelectionSet, v *model.Faq) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._Hiw(ctx, sel, v)
+	return ec._FAQ(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNHIW2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐHiwᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Hiw) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNHIW2ᚖsaᚑbackᚋgraphᚋmodelᚐHiw(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNHIW2ᚖsaᚑbackᚋgraphᚋmodelᚐHiw(ctx context.Context, sel ast.SelectionSet, v *model.Hiw) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._HIW(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {

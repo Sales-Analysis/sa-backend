@@ -10,6 +10,12 @@ type Analysis struct {
 	Disabled    bool   `json:"disabled"`
 }
 
+type Faq struct {
+	ID          int    `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
 type Hiw struct {
 	ID          int    `json:"id"`
 	Title       string `json:"title"`
