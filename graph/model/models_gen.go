@@ -9,3 +9,10 @@ type Analysis struct {
 	Image       string `json:"image"`
 	Disabled    bool   `json:"disabled"`
 }
+
+type Hiw struct {
+	ID          int    `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
+}
