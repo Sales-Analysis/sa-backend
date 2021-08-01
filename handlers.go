@@ -17,8 +17,9 @@ func gqlHandler() *handler.Server {
 	)
 }
 
-func handlers(mux *http.ServeMux) {
-	mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
+func handlers(mux *http.ServeMux, fileStaticHandler http.Handler) {
+	mux.Handle("/", http.StripPrefix("/static/", fileStaticHandler))
+	mux.Handle("/graphql", playground.Handler("GraphQL playground", "/query"))
 	mux.Handle("/query", gqlHandler())
 	mux.HandleFunc("/upload", uploadHandler)
 }
