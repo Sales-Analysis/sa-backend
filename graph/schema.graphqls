@@ -7,6 +7,14 @@ type Analysis {
     disabled: Boolean!
 }
 
+type Hiw {
+    id: Int!
+    title: String!
+    description: String!
+    image: String!
+}
+
 type Query {
-  ListAnalysis: [Analysis!]!
+    ListAnalysis: [Analysis!]!
+    ListHiw: [Hiw!]!
 }
