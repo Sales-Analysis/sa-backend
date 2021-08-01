@@ -14,7 +14,14 @@ type Hiw {
     image: String!
 }
 
+type FAQ {
+    id: Int!
+    title: String!
+    description: String!
+}
+
 type Query {
     ListAnalysis: [Analysis!]!
     ListHiw: [Hiw!]!
+    ListFAQ: [FAQ!]!
 }
