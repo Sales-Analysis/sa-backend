@@ -41,11 +41,19 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if _, err := os.Stat("./tmp"); os.IsNotExist(err) {
+		err = os.Mkdir("./tmp", 0755)
+		if err != nil {
+			NewError(w, err.Error(), 400)
+		}
+	}
+
 	path, err := tempDir("./tmp/", "")
 	if err != nil {
 		NewError(w, err.Error(), 400)
 		return
 	}
+
 	tmpFile, err := tempFile(path, "upload-*.xlsx")
 	if err != nil {
 		NewError(w, err.Error(), 400)
