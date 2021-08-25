@@ -31,7 +31,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	fileExt := filepath.Ext(handler.Filename)
-	if fileExt != ".xlsx" && fileExt != ".csv" {
+	if fileExt != ".xlsx" && fileExt != ".csv" && fileExt != ".xls" {
 		NewError(w, "Invalid file format", 415)
 	}
 
