@@ -15,7 +15,7 @@ const (
 func main() {
 	config, err := loadEnv(confFile, pathConfFile, typeConfFile)
 
-	fs := http.FileServer(http.Dir("./static"))
+	fs := http.FileServer(http.Dir("./data"))
 
 	if err != nil {
 		fmt.Println(err)

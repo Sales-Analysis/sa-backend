@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -13,12 +12,11 @@ import (
 )
 
 func TestUpload(t *testing.T) {
-	path := "./data/test.csv"
+	path := "./test_data/test.csv"
 	file, err := os.Open(path)
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(file)
 
 	defer file.Close()
 	body := &bytes.Buffer{}
