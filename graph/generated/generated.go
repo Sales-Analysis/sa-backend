@@ -59,6 +59,7 @@ type ComplexityRoot struct {
 	AnalysisSelect struct {
 		ID      func(childComplexity int) int
 		Options func(childComplexity int) int
+		Order   func(childComplexity int) int
 		Title   func(childComplexity int) int
 	}
 
@@ -178,6 +179,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AnalysisSelect.Options(childComplexity), true
+
+	case "AnalysisSelect.order":
+		if e.complexity.AnalysisSelect.Order == nil {
+			break
+		}
+
+		return e.complexity.AnalysisSelect.Order(childComplexity), true
 
 	case "AnalysisSelect.title":
 		if e.complexity.AnalysisSelect.Title == nil {
@@ -362,6 +370,7 @@ type AnalysisOption {
 type AnalysisSelect {
     id: ID!
     title: String!
+    order: Int!
     options: [AnalysisOption!]!
 }
 
@@ -800,6 +809,41 @@ func (ec *executionContext) _AnalysisSelect_title(ctx context.Context, field gra
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AnalysisSelect_order(ctx context.Context, field graphql.CollectedField, obj *model.AnalysisSelect) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AnalysisSelect",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Order, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _AnalysisSelect_options(ctx context.Context, field graphql.CollectedField, obj *model.AnalysisSelect) (ret graphql.Marshaler) {
@@ -2532,6 +2576,11 @@ func (ec *executionContext) _AnalysisSelect(ctx context.Context, sel ast.Selecti
 			}
 		case "title":
 			out.Values[i] = ec._AnalysisSelect_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "order":
+			out.Values[i] = ec._AnalysisSelect_order(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

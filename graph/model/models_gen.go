@@ -25,6 +25,7 @@ type AnalysisOption struct {
 type AnalysisSelect struct {
 	ID      string            `json:"id"`
 	Title   string            `json:"title"`
+	Order   int               `json:"order"`
 	Options []*AnalysisOption `json:"options"`
 }
 

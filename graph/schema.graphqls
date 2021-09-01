@@ -35,6 +35,7 @@ type AnalysisOption {
 type AnalysisSelect {
     id: ID!
     title: String!
+    order: Int!
     options: [AnalysisOption!]!
 }
 

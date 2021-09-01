@@ -150,16 +150,19 @@ func (r *queryResolver) getAnalysisSettingsTemplate() []model.AnalysisSelect {
 	return []model.AnalysisSelect{
 		model.AnalysisSelect{
 			ID:      uuid.NewV4().String(),
+			Order:   0,
 			Title:   "Что будем анализировать",
 			Options: options,
 		},
 		model.AnalysisSelect{
 			ID:      uuid.NewV4().String(),
+			Order:   1,
 			Title:   "Что разделить на группы A, B и С",
 			Options: options,
 		},
 		model.AnalysisSelect{
 			ID:      uuid.NewV4().String(),
+			Order:   2,
 			Title:   "По какому показателю разделить группы A, B и С ",
 			Options: options,
 		},
