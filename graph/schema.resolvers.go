@@ -7,6 +7,8 @@ import (
 	"context"
 	"sa-back/graph/generated"
 	"sa-back/graph/model"
+
+	"github.com/satori/go.uuid"
 )
 
 func (r *queryResolver) ListAnalysis(ctx context.Context) ([]*model.Analysis, error) {
@@ -31,6 +33,14 @@ func (r *queryResolver) ListFaq(ctx context.Context) ([]*model.Faq, error) {
 		Faq = append(Faq, &r.listFAQTemplate()[i])
 	}
 	return Faq, nil
+}
+
+func (r *queryResolver) GetAnalysisSettings(ctx context.Context, analysisType *model.AnalysisType) ([]*model.AnalysisSelect, error) {
+	var AnalysisSettings []*model.AnalysisSelect
+	for i := 0; i < len(r.getAnalysisSettingsTemplate()); i++ {
+		AnalysisSettings = append(AnalysisSettings, &r.getAnalysisSettingsTemplate()[i])
+	}
+	return AnalysisSettings, nil
 }
 
 // Query returns generated.QueryResolver implementation.
@@ -130,4 +140,47 @@ func (r *queryResolver) listFAQTemplate() []model.Faq {
 		},
 	}
 	return Faq
+}
+func (r *queryResolver) getAnalysisSettingsTemplate() []model.AnalysisSelect {
+	var options []*model.AnalysisOption
+	for i := 0; i < len(r.getAnalysisOptionsTemplate()); i++ {
+		options = append(options, &r.getAnalysisOptionsTemplate()[i])
+	}
+
+	return []model.AnalysisSelect{
+		model.AnalysisSelect{
+			ID:      uuid.NewV4().String(),
+			Title:   "Что будем анализировать",
+			Options: options,
+		},
+		model.AnalysisSelect{
+			ID:      uuid.NewV4().String(),
+			Title:   "Что разделить на группы A, B и С",
+			Options: options,
+		},
+		model.AnalysisSelect{
+			ID:      uuid.NewV4().String(),
+			Title:   "По какому показателю разделить группы A, B и С ",
+			Options: options,
+		},
+	}
+}
+func (r *queryResolver) getAnalysisOptionsTemplate() []model.AnalysisOption {
+	return []model.AnalysisOption{
+		model.AnalysisOption{
+			ID:       uuid.NewV4().String(),
+			Selected: false,
+			Title:    "Колонка 1",
+		},
+		model.AnalysisOption{
+			ID:       uuid.NewV4().String(),
+			Selected: false,
+			Title:    "Колонка 2",
+		},
+		model.AnalysisOption{
+			ID:       uuid.NewV4().String(),
+			Selected: true,
+			Title:    "Колонка 3",
+		},
+	}
 }

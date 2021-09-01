@@ -50,6 +50,22 @@ type ComplexityRoot struct {
 		Name        func(childComplexity int) int
 	}
 
+	AnalysisOption struct {
+		ID       func(childComplexity int) int
+		Selected func(childComplexity int) int
+		Title    func(childComplexity int) int
+	}
+
+	AnalysisSelect struct {
+		ID      func(childComplexity int) int
+		Options func(childComplexity int) int
+		Title   func(childComplexity int) int
+	}
+
+	AnalysisSettings struct {
+		Selects func(childComplexity int) int
+	}
+
 	Faq struct {
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
@@ -64,9 +80,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		ListAnalysis func(childComplexity int) int
-		ListFaq      func(childComplexity int) int
-		ListHiw      func(childComplexity int) int
+		GetAnalysisSettings func(childComplexity int, analysisType *model.AnalysisType) int
+		ListAnalysis        func(childComplexity int) int
+		ListFaq             func(childComplexity int) int
+		ListHiw             func(childComplexity int) int
 	}
 }
 
@@ -74,6 +91,7 @@ type QueryResolver interface {
 	ListAnalysis(ctx context.Context) ([]*model.Analysis, error)
 	ListHiw(ctx context.Context) ([]*model.Hiw, error)
 	ListFaq(ctx context.Context) ([]*model.Faq, error)
+	GetAnalysisSettings(ctx context.Context, analysisType *model.AnalysisType) ([]*model.AnalysisSelect, error)
 }
 
 type executableSchema struct {
@@ -126,6 +144,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Analysis.Name(childComplexity), true
 
+	case "AnalysisOption.id":
+		if e.complexity.AnalysisOption.ID == nil {
+			break
+		}
+
+		return e.complexity.AnalysisOption.ID(childComplexity), true
+
+	case "AnalysisOption.selected":
+		if e.complexity.AnalysisOption.Selected == nil {
+			break
+		}
+
+		return e.complexity.AnalysisOption.Selected(childComplexity), true
+
+	case "AnalysisOption.title":
+		if e.complexity.AnalysisOption.Title == nil {
+			break
+		}
+
+		return e.complexity.AnalysisOption.Title(childComplexity), true
+
+	case "AnalysisSelect.id":
+		if e.complexity.AnalysisSelect.ID == nil {
+			break
+		}
+
+		return e.complexity.AnalysisSelect.ID(childComplexity), true
+
+	case "AnalysisSelect.options":
+		if e.complexity.AnalysisSelect.Options == nil {
+			break
+		}
+
+		return e.complexity.AnalysisSelect.Options(childComplexity), true
+
+	case "AnalysisSelect.title":
+		if e.complexity.AnalysisSelect.Title == nil {
+			break
+		}
+
+		return e.complexity.AnalysisSelect.Title(childComplexity), true
+
+	case "AnalysisSettings.selects":
+		if e.complexity.AnalysisSettings.Selects == nil {
+			break
+		}
+
+		return e.complexity.AnalysisSettings.Selects(childComplexity), true
+
 	case "FAQ.description":
 		if e.complexity.Faq.Description == nil {
 			break
@@ -174,6 +241,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Hiw.Title(childComplexity), true
+
+	case "Query.getAnalysisSettings":
+		if e.complexity.Query.GetAnalysisSettings == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getAnalysisSettings_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetAnalysisSettings(childComplexity, args["analysisType"].(*model.AnalysisType)), true
 
 	case "Query.ListAnalysis":
 		if e.complexity.Query.ListAnalysis == nil {
@@ -273,7 +352,31 @@ type Query {
     ListHIW: [HIW!]!
     ListFAQ: [FAQ!]!
 }
-`, BuiltIn: false},
+
+type AnalysisOption {
+    id: ID!
+    selected: Boolean!
+    title: String!
+}
+
+type AnalysisSelect {
+    id: ID!
+    title: String!
+    options: [AnalysisOption!]!
+}
+
+type AnalysisSettings {
+    selects: [AnalysisSelect!]!
+}
+
+
+enum AnalysisType {
+    ABC
+}
+
+extend type Query {
+    getAnalysisSettings(analysisType: AnalysisType): [AnalysisSelect!]!
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -293,6 +396,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getAnalysisSettings_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.AnalysisType
+	if tmp, ok := rawArgs["analysisType"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("analysisType"))
+		arg0, err = ec.unmarshalOAnalysisType2ᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisType(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["analysisType"] = arg0
 	return args, nil
 }
 
@@ -507,6 +625,251 @@ func (ec *executionContext) _Analysis_disabled(ctx context.Context, field graphq
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AnalysisOption_id(ctx context.Context, field graphql.CollectedField, obj *model.AnalysisOption) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AnalysisOption",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AnalysisOption_selected(ctx context.Context, field graphql.CollectedField, obj *model.AnalysisOption) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AnalysisOption",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Selected, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AnalysisOption_title(ctx context.Context, field graphql.CollectedField, obj *model.AnalysisOption) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AnalysisOption",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AnalysisSelect_id(ctx context.Context, field graphql.CollectedField, obj *model.AnalysisSelect) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AnalysisSelect",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AnalysisSelect_title(ctx context.Context, field graphql.CollectedField, obj *model.AnalysisSelect) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AnalysisSelect",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AnalysisSelect_options(ctx context.Context, field graphql.CollectedField, obj *model.AnalysisSelect) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AnalysisSelect",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Options, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.AnalysisOption)
+	fc.Result = res
+	return ec.marshalNAnalysisOption2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisOptionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AnalysisSettings_selects(ctx context.Context, field graphql.CollectedField, obj *model.AnalysisSettings) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AnalysisSettings",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Selects, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.AnalysisSelect)
+	fc.Result = res
+	return ec.marshalNAnalysisSelect2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisSelectᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _FAQ_id(ctx context.Context, field graphql.CollectedField, obj *model.Faq) (ret graphql.Marshaler) {
@@ -857,6 +1220,48 @@ func (ec *executionContext) _Query_ListFAQ(ctx context.Context, field graphql.Co
 	res := resTmp.([]*model.Faq)
 	fc.Result = res
 	return ec.marshalNFAQ2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐFaqᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getAnalysisSettings(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getAnalysisSettings_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetAnalysisSettings(rctx, args["analysisType"].(*model.AnalysisType))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.AnalysisSelect)
+	fc.Result = res
+	return ec.marshalNAnalysisSelect2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisSelectᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2072,6 +2477,107 @@ func (ec *executionContext) _Analysis(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
+var analysisOptionImplementors = []string{"AnalysisOption"}
+
+func (ec *executionContext) _AnalysisOption(ctx context.Context, sel ast.SelectionSet, obj *model.AnalysisOption) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, analysisOptionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AnalysisOption")
+		case "id":
+			out.Values[i] = ec._AnalysisOption_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "selected":
+			out.Values[i] = ec._AnalysisOption_selected(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "title":
+			out.Values[i] = ec._AnalysisOption_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var analysisSelectImplementors = []string{"AnalysisSelect"}
+
+func (ec *executionContext) _AnalysisSelect(ctx context.Context, sel ast.SelectionSet, obj *model.AnalysisSelect) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, analysisSelectImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AnalysisSelect")
+		case "id":
+			out.Values[i] = ec._AnalysisSelect_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "title":
+			out.Values[i] = ec._AnalysisSelect_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "options":
+			out.Values[i] = ec._AnalysisSelect_options(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var analysisSettingsImplementors = []string{"AnalysisSettings"}
+
+func (ec *executionContext) _AnalysisSettings(ctx context.Context, sel ast.SelectionSet, obj *model.AnalysisSettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, analysisSettingsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AnalysisSettings")
+		case "selects":
+			out.Values[i] = ec._AnalysisSettings_selects(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var fAQImplementors = []string{"FAQ"}
 
 func (ec *executionContext) _FAQ(ctx context.Context, sel ast.SelectionSet, obj *model.Faq) graphql.Marshaler {
@@ -2203,6 +2709,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_ListFAQ(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getAnalysisSettings":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getAnalysisSettings(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -2515,6 +3035,100 @@ func (ec *executionContext) marshalNAnalysis2ᚖsaᚑbackᚋgraphᚋmodelᚐAnal
 	return ec._Analysis(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNAnalysisOption2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisOptionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AnalysisOption) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAnalysisOption2ᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisOption(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNAnalysisOption2ᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisOption(ctx context.Context, sel ast.SelectionSet, v *model.AnalysisOption) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._AnalysisOption(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAnalysisSelect2ᚕᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisSelectᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AnalysisSelect) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAnalysisSelect2ᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisSelect(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNAnalysisSelect2ᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisSelect(ctx context.Context, sel ast.SelectionSet, v *model.AnalysisSelect) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._AnalysisSelect(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2622,6 +3236,21 @@ func (ec *executionContext) marshalNHIW2ᚖsaᚑbackᚋgraphᚋmodelᚐHiw(ctx c
 		return graphql.Null
 	}
 	return ec._HIW(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalID(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
@@ -2881,6 +3510,22 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalOAnalysisType2ᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisType(ctx context.Context, v interface{}) (*model.AnalysisType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.AnalysisType)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOAnalysisType2ᚖsaᚑbackᚋgraphᚋmodelᚐAnalysisType(ctx context.Context, sel ast.SelectionSet, v *model.AnalysisType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

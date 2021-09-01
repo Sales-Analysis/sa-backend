@@ -2,12 +2,34 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type Analysis struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Image       string `json:"image"`
 	Disabled    bool   `json:"disabled"`
+}
+
+type AnalysisOption struct {
+	ID       string `json:"id"`
+	Selected bool   `json:"selected"`
+	Title    string `json:"title"`
+}
+
+type AnalysisSelect struct {
+	ID      string            `json:"id"`
+	Title   string            `json:"title"`
+	Options []*AnalysisOption `json:"options"`
+}
+
+type AnalysisSettings struct {
+	Selects []*AnalysisSelect `json:"selects"`
 }
 
 type Faq struct {
@@ -21,4 +43,43 @@ type Hiw struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Image       string `json:"image"`
+}
+
+type AnalysisType string
+
+const (
+	AnalysisTypeAbc AnalysisType = "ABC"
+)
+
+var AllAnalysisType = []AnalysisType{
+	AnalysisTypeAbc,
+}
+
+func (e AnalysisType) IsValid() bool {
+	switch e {
+	case AnalysisTypeAbc:
+		return true
+	}
+	return false
+}
+
+func (e AnalysisType) String() string {
+	return string(e)
+}
+
+func (e *AnalysisType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = AnalysisType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid AnalysisType", str)
+	}
+	return nil
+}
+
+func (e AnalysisType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

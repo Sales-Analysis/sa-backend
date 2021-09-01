@@ -25,3 +25,28 @@ type Query {
     ListHIW: [HIW!]!
     ListFAQ: [FAQ!]!
 }
+
+type AnalysisOption {
+    id: ID!
+    selected: Boolean!
+    title: String!
+}
+
+type AnalysisSelect {
+    id: ID!
+    title: String!
+    options: [AnalysisOption!]!
+}
+
+type AnalysisSettings {
+    selects: [AnalysisSelect!]!
+}
+
+
+enum AnalysisType {
+    ABC
+}
+
+extend type Query {
+    getAnalysisSettings(analysisType: AnalysisType): [AnalysisSelect!]!
+}
